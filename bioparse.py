@@ -18,6 +18,20 @@ class Genbank(object):
             dictionary[value] = dictionary.pop(key)
         return dictionary
 
+    def list_of_dictionary_records_to_dictionary(self, list_of_dictionaries, primary_key='id'):
+        """
+
+        :param list_of_dictionaries: A list where each element is a dictionary.
+        :param primary_key: A unique identifier key contained in each list element dictionary.
+        :return: A new dictionary where each key is the primary_key and value is a dictionary from the list.
+        """
+
+        dictionary = {}
+
+        for record in list_of_dictionaries:
+            dictionary[record[primary_key]] = record
+        return dictionary
+
     def object_to_dictionary(self, value):
 
         return value.__dict__  # value.__dict__  # vars(value)
@@ -130,3 +144,9 @@ class Genbank(object):
             clean_genbank_records.append(raw_seq_record_dict)
 
         return clean_genbank_records
+
+    def fasta_to_dictionary(self):
+        pass
+
+    def fastq_to_dictionary(self):
+        pass

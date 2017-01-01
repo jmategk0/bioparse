@@ -2,7 +2,7 @@ import bioparse
 import time
 # import json
 
-# from pprint import pprint
+from pprint import pprint
 parser = bioparse.Genbank()
 
 
@@ -31,5 +31,8 @@ print("--- %s seconds ---" % (end_time - start_time))
 a = {"_seq": "AGTAGTAG", "_name": "bob", "thing": "stuff"}
 b = {"_seq": "seq", "_name": "name"}
 
-c = parser.rename_dictionary_keys(dictionary=a,dictionary_key_map=b)
+c = parser.rename_dictionary_keys(dictionary=a, dictionary_key_map=b)
 print(c)
+
+var = parser.list_of_dictionary_records_to_dictionary(list_of_dictionaries=d)
+pprint(var)
