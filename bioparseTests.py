@@ -27,3 +27,9 @@ print("--- %s seconds ---" % (end_time - start_time))
 # --- 0.03213834762573242 seconds ---
 
 # diff is ~0.001 seconds. Will this matter at scale? What is more readable?
+
+a = {"_seq": "AGTAGTAG", "_name": "bob", "thing": "stuff"}
+b = {"_seq": "seq", "_name": "name"}
+
+c = parser.rename_dictionary_keys(dictionary=a,dictionary_key_map=b)
+print(c)

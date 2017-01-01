@@ -6,6 +6,18 @@ class Genbank(object):
     def __init__(self):
         self.filename = ""
 
+    def rename_dictionary_keys(self, dictionary, dictionary_key_map):
+        """
+
+        :param dictionary: dictionary with keys that we want to rename.
+        :param dictionary_key_map: dictionary that maps old key names (keys) with new key names (value).
+        :return: dictionary where keys have been replaced with the values from dictionary_key_map
+        """
+
+        for key, value in dictionary_key_map.items():
+            dictionary[value] = dictionary.pop(key)
+        return dictionary
+
     def object_to_dictionary(self, value):
 
         return value.__dict__  # value.__dict__  # vars(value)
