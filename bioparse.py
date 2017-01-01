@@ -1,10 +1,11 @@
 from Bio import SeqIO
 
 
-class Genbank(object):
+class BaseParser(object):
 
     def __init__(self):
         self.filename = ""
+        self.data = ""
 
     def rename_dictionary_keys(self, dictionary, dictionary_key_map):
         """
@@ -32,9 +33,45 @@ class Genbank(object):
             dictionary[record[primary_key]] = record
         return dictionary
 
+    def remove_keys_from_dictionary(self, dictionary, list_of_keys):
+
+        if isinstance(list_of_keys, str):
+            list_of_keys = [list_of_keys]
+
+        for key_name in list_of_keys:
+            dictionary.pop(key_name)
+        return dictionary
+
     def object_to_dictionary(self, value):
 
         return value.__dict__  # value.__dict__  # vars(value)
+
+    def genbank_to_dictionary(self, genbank_file):
+
+        raise NotImplementedError
+
+    def fasta_to_dictionary(self, fasta_filename):
+
+        raise NotImplementedError
+
+    def fastq_to_dictionary(self, fastq_filename):
+
+        raise NotImplementedError
+
+    def fastq_to_fasta(self, fastq_filename, fasta_filename):
+
+        raise NotImplementedError
+
+    def genbank_to_fasta(self, genbank_filename, fasta_filename):
+
+        raise NotImplementedError
+
+    def fasta_to_genbank(self, genbank_filename, fasta_filename):
+
+        raise NotImplementedError
+
+
+class BioPython(BaseParser):
 
     def clean_featurelocation(self, featurelocations):
 
@@ -145,8 +182,91 @@ class Genbank(object):
 
         return clean_genbank_records
 
-    def fasta_to_dictionary(self):
-        pass
+    def fasta_to_dictionary(self, fasta_filename, raw_biopython=True):
 
-    def fastq_to_dictionary(self):
-        pass
+        keys_to_remove = ["_per_letter_annotations", "annotations", "dbxrefs", "features"]
+        sequences = []
+
+        if raw_biopython:
+
+            for seq_record_obj in SeqIO.parse(fasta_filename, "fasta"):
+                sequence = self.object_to_dictionary(value=seq_record_obj)
+                sequence["_seq"] = self.clean_seq(biopython_seq=sequence["_seq"])
+                sequences.append(sequence)
+        else:
+            for seq_record_obj in SeqIO.parse(fasta_filename, "fasta"):
+                sequence = self.object_to_dictionary(value=seq_record_obj)
+                sequence["seq"] = str(sequence["_seq"])
+                sequence.pop("_seq")
+                sequence = self.remove_keys_from_dictionary(sequence, keys_to_remove)
+                sequences.append(sequence)
+        return sequences
+
+    def fastq_to_dictionary(self, fastq_filename, fastq_format="fastq", raw_biopython=True):
+        # Format options: ["fastq-solexa", "fastq-illumina", "fastq"]
+        # SRR020192 example file
+
+        keys_to_remove = ["annotations", "dbxrefs", "features"]
+        sequences = []
+
+        if raw_biopython:
+            for seq_record_obj in SeqIO.parse(fastq_filename, fastq_format):
+                sequence = self.object_to_dictionary(value=seq_record_obj)
+                sequence["_seq"] = self.clean_seq(biopython_seq=sequence["_seq"])
+                sequences.append(sequence)
+        else:
+            for seq_record_obj in SeqIO.parse(fastq_filename, fastq_format):
+                sequence = self.object_to_dictionary(value=seq_record_obj)
+                sequence["seq"] = str(sequence["_seq"])
+                sequence.pop("_seq")
+                sequence = self.remove_keys_from_dictionary(sequence, keys_to_remove)
+                sequences.append(sequence)
+        return sequences
+
+    def filter_fastq(self):
+        # just an example from the biopython docs 
+        good_reads = (rec for rec in SeqIO.parse("SRR020192.fastq", "fastq") if min(rec.letter_annotations["phred_quality"]) >= 20)
+        count = SeqIO.write(good_reads, "good_quality.fastq", "fastq")
+        print("Saved %i reads" % count)
+
+    def fastq_to_fasta(self, fastq_filename, fasta_filename):
+
+        count = SeqIO.convert(fastq_filename, "fastq", fasta_filename, "fasta")
+        return count
+
+    def genbank_to_fasta(self, genbank_filename, fasta_filename):
+
+        count = SeqIO.convert(genbank_filename, "genbank", fasta_filename, "fasta")
+        return count
+
+    def fasta_to_genbank(self, genbank_filename, fasta_filename):
+
+        count = SeqIO.convert(fasta_filename, "fasta", genbank_filename, "genbank")
+        return count
+
+
+class BioJSON(BaseParser):
+
+    def genbank_to_dictionary(self, genbank_file):
+
+        raise NotImplementedError
+
+    def fasta_to_dictionary(self, fasta_filename):
+
+        raise NotImplementedError
+
+    def fastq_to_dictionary(self, fastq_filename):
+
+        raise NotImplementedError
+
+    def fastq_to_fasta(self, fastq_filename, fasta_filename):
+
+        raise NotImplementedError
+
+    def genbank_to_fasta(self, genbank_filename, fasta_filename):
+
+        raise NotImplementedError
+
+    def fasta_to_genbank(self, genbank_filename, fasta_filename):
+
+        raise NotImplementedError

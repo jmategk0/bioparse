@@ -3,7 +3,7 @@ import time
 # import json
 
 from pprint import pprint
-parser = bioparse.Genbank()
+parser = bioparse.BioPython()
 
 
 start_time = time.time()
@@ -32,7 +32,13 @@ a = {"_seq": "AGTAGTAG", "_name": "bob", "thing": "stuff"}
 b = {"_seq": "seq", "_name": "name"}
 
 c = parser.rename_dictionary_keys(dictionary=a, dictionary_key_map=b)
-print(c)
+#print(c)
 
 var = parser.list_of_dictionary_records_to_dictionary(list_of_dictionaries=d)
-pprint(var)
+#pprint(var)
+
+var1 = parser.fasta_to_dictionary(fasta_filename="test_files/biopython/ls_orchid.fasta", raw_biopython=False)
+#pprint(var1)
+
+var2 = parser.fastq_to_dictionary(fastq_filename="test_files/biopython/wiki_example.fastq", raw_biopython=False)
+pprint(var2)
